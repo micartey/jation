@@ -23,11 +23,12 @@
   <a href="#-getting-started">Getting started</a>
 </p>
 
+
 ## 📚 Introduction
 
 jation is a java reflection based event manager which uses the build in java reflection api to automatically invoke methods with parameters and eases the work of a developer by reducing the amount of possible mistakes or missing method invokations.
 
-An event manager is a must have in big or event based applications. This project amies to optimize the event manager I previously build and was used to power my anticheat.
+An event manager is a must have in big or event based applications. This project amies to optimize the event manager I previously build and which was used to power my anticheat.
 
 ## 🔗 Build Tools
 
