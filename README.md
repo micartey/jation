@@ -1,47 +1,41 @@
 # jation
 
 <div align="center">
-  <a href="https://jitpack.io/v/micartey/jation/LATEST">
+  <a href="https://www.oracle.com/java/">
     <img
-      src="https://jitpack.io/v/micartey/jation.svg"
+      src="https://img.shields.io/badge/Written%20in-java-%23EF4041?style=for-the-badge"
+      height="30"
+    />
+  </a>
+  <a href="https://clientastisch.github.io/yawen/docs" target="_blank">
+    <img
+      src="https://img.shields.io/badge/javadoc-reference-5272B4.svg?style=for-the-badge"
+      height="30"
     />
   </a>
 </div>
 
 <br>
 
-- [jation](#jation)
-  - [Dependencies required](#dependencies-required)
-    - [Step 1. Add the JitPack repository to your build file](#step-1-add-the-jitpack-repository-to-your-build-file)
-    - [Step 2. Add the dependencies](#step-2-add-the-dependencies)
-  - [How to use](#how-to-use)
-    - [Create a new Observer](#create-a-new-observer)
-    - [Subscribe classes](#subscribe-classes)
-    - [Observe methods](#observe-methods)
-    - [Publish JationEvents](#publish-jationevents)
+<p align="center">
+  <a href="#-introduction">Introduction</a> |
+  <a href="#-build-tools">Maven/Gradle</a> |
+  <a href="#-getting-started">Getting started</a>
+</p>
 
-## Dependencies required
+## 📚 Introduction
 
-### Step 1. Add the JitPack repository to your build file
+jation is a java reflection based event manager which uses the build in java reflection api to automatically invoke methods with parameters and eases the work of a developer by reducing the amount of possible mistakes or missing method invokations.
 
-```xml
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-```
+An event manager is a must have in big or event based applications. This project amies to optimize the event manager I previously build and was used to power my anticheat.
 
-### Step 2. Add the dependencies
+## 🔗 Build Tools
+
+You can use Maven or Gradle to add this dependency to your project. Therefore you have to add use [jitpack](https://jitpack.io/) and apply the changes as documented.
+
+Furthermore, you have to add another dependency named `refelctions` because jation depends on this dependency in order to `@AutoSubscribe` classes.
 
 ```xml
-<dependency>
-    <groupId>com.github.micartey</groupId>
-    <artifactId>jation</artifactId>
-    <version>1.0.7</version>
-</dependency>
-
 <dependency>
     <groupId>org.reflections</groupId>
     <artifactId>reflections</artifactId>
@@ -49,7 +43,7 @@
 </dependency>
 ```
 
-## How to use
+## 🎈 Getting Started
 
 ### Create a new Observer
 
@@ -100,13 +94,15 @@ public void onEvent(MyTestEvent event, @Null String additive) {
 
 `JationEvents` can be `published` with additional parameters. In case your method uses them and there is a possiblity, that the parameter is not always defined, you need to annotate the parameter with `@Null`.
 
-### Publish JationEvents
+### Create JationEvents
 
 ```java
 public class TestEvent implements JationEvent<TestEvent> {
 
 }
 ```
+
+### Publish JationEvents
 
 ```java
 new TestEvent().publish(observer, "additional information", 5);
