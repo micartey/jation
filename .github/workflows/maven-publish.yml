@@ -28,10 +28,10 @@ jobs:
     - name: Prepare artifact
       run: |
         mkdir bin
-        cp ./target ./bin
+        cp -r ./target ./bin
 
     - name: Upload java release
       uses: actions/upload-artifact@v2
       with:
-        name: NeuralNetwork.zip
+        name: Jation.zip
         path: ./bin
