@@ -32,7 +32,7 @@ An event manager is a must have in big or event based applications. This project
 
 ## 🔗 Build Tools
 
-You can use Maven or Gradle to add this dependency to your project. Therefore you have to add use [jitpack](https://jitpack.io/) and apply the changes as documented.
+You can use Maven or Gradle to add this dependency to your project. Therefore you have to add use [jitpack](https://jitpack.io/#Clientastisch/jation/master-SNAPSHOT) and apply the changes as documented.
 
 Furthermore, you have to add another dependency named `refelctions` because jation depends on this dependency in order to `@AutoSubscribe` classes.
 
