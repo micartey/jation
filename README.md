@@ -7,13 +7,13 @@
       height="30"
     />
   </a>
-  <a href="https://jitpack.io/#Clientastisch/jation/master-SNAPSHOT">
+  <a href="https://jitpack.io/#micartey/jation/master-SNAPSHOT">
     <img
       src="https://img.shields.io/badge/jitpack-master-%2321f21?style=for-the-badge"
       height="30"
     />
   </a>
-  <a href="https://clientastisch.github.io/jation/docs" target="_blank">
+  <a href="https://micartey.github.io/jation/docs" target="_blank">
     <img
       src="https://img.shields.io/badge/javadoc-reference-5272B4.svg?style=for-the-badge"
       height="30"
@@ -38,7 +38,7 @@ An event manager is a must have in big or event based applications. This project
 
 ## 🔗 Build Tools
 
-You can use Maven or Gradle to add this dependency to your project. Therefore you have to add use [jitpack](https://jitpack.io/#Clientastisch/jation/master-SNAPSHOT) and apply the changes as documented.
+You can use Maven or Gradle to add this dependency to your project. Therefore you have to add use [jitpack](https://jitpack.io/#micartey/jation/master-SNAPSHOT) and apply the changes as documented.
 
 Furthermore, you have to add another dependency named `refelctions` because jation depends on this dependency in order to `@AutoSubscribe` classes.
 
