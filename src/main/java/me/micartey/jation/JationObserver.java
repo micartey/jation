@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -115,31 +116,31 @@ public class JationObserver {
     }
 
     @SuppressWarnings("unused")
-    public void on(Class<? extends JationEvent<?>> clazz, @NonNull Consumer<JationEvent<?>> consumer) {
-        this.on(clazz, object -> {
-            consumer.accept(object);
+    public <T extends JationEvent<T>> void on(Class<T> clazz, @NonNull Consumer<T> consumer) {
+        this.on(clazz, t -> {
+            consumer.accept(t);
             return true;
         });
     }
 
-    public void on(Class<? extends JationEvent<?>> clazz, @NonNull Function<JationEvent<?>, Boolean> function) {
+    public <T extends JationEvent<T>> void on(Class<T> clazz, @NonNull Function<T, Boolean> function) {
         List<Function<JationEvent<?>, Boolean>> functions = this.outset.getOrDefault(clazz, new ArrayList<>());
-        functions.add(function);
+        functions.add(this.transformFunction(function));
         this.outset.put(clazz, functions);
     }
 
     @SuppressWarnings("unused")
-    public void forEach(Class<? extends JationEvent<?>> clazz, @NonNull TriConsumer<Boolean, JationEvent<?>, Method, Object> consumer) {
+    public <T extends JationEvent<T>> void forEach(Class<T> clazz, @NonNull TriConsumer<Boolean, T, Method, Object> consumer) {
         List<Function<List<Object>, Boolean>> functions = this.forEach.getOrDefault(clazz, new ArrayList<>());
-        functions.add(object -> consumer.accept((JationEvent<?>) object.get(0), (Method) object.get(1), object.get(2)));
+        functions.add(object -> consumer.accept((T) object.get(0), (Method) object.get(1), object.get(2)));
         this.forEach.put(clazz, functions);
     }
 
     @SuppressWarnings("unused")
-    public void after(Class<? extends JationEvent<?>> clazz, @NonNull Consumer<JationEvent<?>> consumer) {
+    public <T extends JationEvent<T>> void after(Class<T> clazz, @NonNull Consumer<T> consumer) {
         List<Function<JationEvent<?>, Boolean>> functions = this.closing.getOrDefault(clazz, new ArrayList<>());
         functions.add(object -> {
-            consumer.accept(object);
+            consumer.accept((T) object);
             return true;
         });
         this.closing.put(clazz, functions);
@@ -162,6 +163,15 @@ public class JationObserver {
         return this.methods.stream().filter(method -> Arrays.stream(method.getParameters())
                 .anyMatch(parameter -> parameter.getType().equals(event)))
                 .collect(Collectors.toSet());
+    }
+
+    /*
+     * This shit is getting to the edge of the compilers capabilities for generics.
+     * This works due to Java not validating the generics at runtime but throwing a ClassCastException if not able.
+     * The compiler doesn't like this however - Me as well
+     */
+    private <T extends JationEvent<T>, U> Function<JationEvent<?>, U> transformFunction(Function<T, U> function) {
+        return (Function<JationEvent<?>, U>) function;
     }
 
     private <T> Set<Function<T, Boolean>> getFunctions(Class<?> clazz, Map<Class<? extends JationEvent<?>>, List<Function<T, Boolean>>> map) {
