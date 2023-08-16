@@ -62,10 +62,12 @@ public class JationObserver {
         this(classpath, Executors.newCachedThreadPool());
     }
 
+    @SuppressWarnings("unused")
     public void subscribe(Object... instance) {
         this.instances.addAll(Arrays.asList(instance));
     }
 
+    @SuppressWarnings("unused")
     public void unsubscribe(Object... instance) {
         this.instances.removeAll(Arrays.asList(instance));
     }
@@ -112,13 +114,12 @@ public class JationObserver {
         return clazz.newInstance();
     }
 
+    @SuppressWarnings("unused")
     public void on(Class<? extends JationEvent<?>> clazz, @NonNull Consumer<JationEvent<?>> consumer) {
-        List<Function<JationEvent<?>, Boolean>> functions = this.outset.getOrDefault(clazz, new ArrayList<>());
-        functions.add(object -> {
+        this.on(clazz, object -> {
             consumer.accept(object);
             return true;
         });
-        this.outset.put(clazz, functions);
     }
 
     public void on(Class<? extends JationEvent<?>> clazz, @NonNull Function<JationEvent<?>, Boolean> function) {
@@ -127,12 +128,14 @@ public class JationObserver {
         this.outset.put(clazz, functions);
     }
 
+    @SuppressWarnings("unused")
     public void forEach(Class<? extends JationEvent<?>> clazz, @NonNull TriConsumer<Boolean, JationEvent<?>, Method, Object> consumer) {
         List<Function<List<Object>, Boolean>> functions = this.forEach.getOrDefault(clazz, new ArrayList<>());
         functions.add(object -> consumer.accept((JationEvent<?>) object.get(0), (Method) object.get(1), object.get(2)));
         this.forEach.put(clazz, functions);
     }
 
+    @SuppressWarnings("unused")
     public void after(Class<? extends JationEvent<?>> clazz, @NonNull Consumer<JationEvent<?>> consumer) {
         List<Function<JationEvent<?>, Boolean>> functions = this.closing.getOrDefault(clazz, new ArrayList<>());
         functions.add(object -> {
