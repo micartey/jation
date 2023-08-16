@@ -36,7 +36,7 @@ jation is a java reflection based event manager which uses the build in java ref
 
 An event manager is a must have in big or event based applications. This project amies to optimize the event manager I previously build and which was used to power my anticheat.
 
-## 🔗 Build Tools
+### 🔗 Build Tools
 
 You can use Maven or Gradle to add this dependency to your project. Therefore you have to add use [jitpack](https://jitpack.io/#micartey/jation/master-SNAPSHOT) and apply the changes as documented.
 
@@ -50,15 +50,15 @@ Furthermore, you have to add another dependency named `refelctions` because jati
 </dependency>
 ```
 
-## 🎈 Getting Started
+### 🎈 Getting Started
 
-### Create a new Observer
+#### Create a new Observer
 
 ```java
 JationObserver observer = new JationObserver("my.main.package");
 ```
 
-### Subscribe classes
+#### Subscribe classes
 
 There are two different methods to subscribe a class. <br>
 First of all you can add them manually:
@@ -86,10 +86,10 @@ public class TestClass {
 }
 ```
 
-### Observe methods
+#### Reflection pattern
 
-To observe methods you need to annotate them with `@Observe`. <br>
-Another annotation `@Async` is optional to call them in the [ForkJoinPool](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html#commonPool--) asynchronously.
+To *observe* methods you need to annotate them with `@Observe`. <br>
+The `@Async` annotation is optional and can invoke the method in the [ForkJoinPool](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html#commonPool--) asynchronously.
 
 ```java
 @Async
@@ -99,9 +99,26 @@ public void onEvent(MyTestEvent event, @Null String additive) {
 }
 ```
 
-`JationEvents` can be `published` with additional parameters. In case your method uses them and there is a possiblity, that the parameter is not always defined, you need to annotate the parameter with `@Null`.
+`JationEvents` can be `published` with additional parameters. 
+In case your method uses them and there is a possiblity, that the parameter is not always defined, you need to annotate the parameter with `@Null`.
 
-### Create JationEvents
+#### Consumer Pattern
+
+Reflection is slow. Some say it is more than 100% slower then normal method invokations.
+This is the result of the runtime being unable to perform any optimizations.
+
+Therefore, it is recommended to use the consumer pattern for performance critical projects.
+
+```java
+observer.on(TestEvent.class, (event) -> {
+    // Access the event
+});
+```
+
+The consumer pattern has a major disadvantage apart from scalability: Additional parameters can't be passed on.
+
+
+#### Create Events
 
 ```java
 public class TestEvent implements JationEvent<TestEvent> {
@@ -109,7 +126,7 @@ public class TestEvent implements JationEvent<TestEvent> {
 }
 ```
 
-### Publish JationEvents
+#### Publish Events
 
 ```java
 new TestEvent().publish(observer, "additional information", 5);
