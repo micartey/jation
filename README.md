@@ -40,50 +40,23 @@ An event manager is a must have in big or event based applications. This project
 
 You can use Maven or Gradle to add this dependency to your project. Therefore you have to add use [jitpack](https://jitpack.io/#micartey/jation/master-SNAPSHOT) and apply the changes as documented.
 
-Furthermore, you have to add another dependency named `refelctions` because jation depends on this dependency in order to `@AutoSubscribe` classes.
-
-```xml
-<dependency>
-    <groupId>org.reflections</groupId>
-    <artifactId>reflections</artifactId>
-    <version>LATEST</version>
-</dependency>
-```
-
 ### 🎈 Getting Started
 
 #### Create a new Observer
 
 ```java
-JationObserver observer = new JationObserver("my.main.package");
+JationObserver observer = new JationObserver();
 ```
 
 #### Subscribe classes
 
-There are two different methods to subscribe a class. <br>
-First of all you can add them manually:
+To subscribe classes you need to call the `subscribe` method and pass the object instances to the varargs parameter.
 
 ```java
 observer.subscribe(
    new TestClass(),
    new OtherTestClass()
 );
-```
-
-Secondly you can add the annotation `@AutoSubscribe` to a class. <br>
-However, this requires a constructor without any arguments:
-
-```java
-package my.main.package.sub;
-
-@AutoSubscribe
-public class TestClass {
-
-   public TestClass() {
-
-   }
-
-}
 ```
 
 #### Reflection pattern
@@ -99,13 +72,15 @@ public void onEvent(MyTestEvent event, @Null String additive) {
 }
 ```
 
-`JationEvents` can be `published` with additional parameters. 
-In case your method uses them and there is a possiblity, that the parameter is not always defined, you need to annotate the parameter with `@Null`.
+Events can be published with additional parameters. 
+In case your method uses them and there is a possibility, that the parameter is not always defined, you need to annotate the parameter with `@Null`.
 
 #### Consumer Pattern
 
-Reflection is slow. Some say it is more than 100% slower then normal method invokations.
+Reflection is slow. Some say it is more than 100% slower than normal method invocations.
 This is the result of the runtime being unable to perform any optimizations.
+
+> This will be fixed in later versions by utilizing ASM to generate invocation code at runtime to allow the JVM to optimize the calls
 
 Therefore, it is recommended to use the consumer pattern for performance critical projects.
 
@@ -120,6 +95,8 @@ The consumer pattern has a major disadvantage apart from scalability: Additional
 
 #### Create Events
 
+To create an event you need to implement the `JationEvent` interface. The interface has a generic type parameter which is the event itself.
+
 ```java
 public class TestEvent implements JationEvent<TestEvent> {
 
@@ -128,8 +105,13 @@ public class TestEvent implements JationEvent<TestEvent> {
 
 #### Publish Events
 
+To publish an event you need to call the `publish` method and pass the event instance to the first parameter and the additional parameters to the varargs parameter.
+
 ```java
+// Publish the event to all subscribed classes
 new TestEvent().publish(observer, "additional information", 5);
 
+
+// Publish the event to all subscribed classes asynchronously
 new TestEvent().publishAsync(observer);
 ```

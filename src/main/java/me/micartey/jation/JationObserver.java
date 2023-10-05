@@ -3,24 +3,16 @@ package me.micartey.jation;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import me.micartey.jation.annotations.Async;
-import me.micartey.jation.annotations.AutoSubscribe;
 import me.micartey.jation.annotations.Null;
 import me.micartey.jation.annotations.Observe;
 import me.micartey.jation.interfaces.JationEvent;
 import me.micartey.jation.interfaces.TriConsumer;
-import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,43 +26,36 @@ public class JationObserver {
 
     private final ExecutorService executorService;
 
-    private final List<Object> instances;
-    private final Set<Method> methods;
+    private final Map<Object, List<Method>> instances;
 
-    public JationObserver(@NonNull String classpath, @NonNull ExecutorService executorService) {
-        this.methods = new Reflections(new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forPackage(classpath))
-                .setScanners(new MethodAnnotationsScanner()))
-                .getMethodsAnnotatedWith(Observe.class);
-
-        this.instances = new ArrayList<>();
-
-        new Reflections(new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forPackage(classpath))
-                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-                .getTypesAnnotatedWith(AutoSubscribe.class)
-                .stream().map(this::createInstance)
-                .forEach(this::subscribe);
-
+    public JationObserver(@NonNull ExecutorService executorService) {
         this.executorService = executorService;
+
+        this.instances = new HashMap<>();
 
         this.outset = new WeakHashMap<>();
         this.forEach = new WeakHashMap<>();
         this.closing = new WeakHashMap<>();
     }
 
-    public JationObserver(@NonNull String classpath) {
-        this(classpath, Executors.newCachedThreadPool());
+    public JationObserver() {
+        this(Executors.newCachedThreadPool());
     }
 
     @SuppressWarnings("unused")
-    public void subscribe(Object... instance) {
-        this.instances.addAll(Arrays.asList(instance));
+    public void subscribe(Object... instances) {
+        Arrays.stream(instances).forEach(instance -> {
+            List<Method> methods = Arrays.stream(instance.getClass().getDeclaredMethods())
+                    .filter(method -> method.isAnnotationPresent(Observe.class))
+                    .collect(Collectors.toList());
+
+            this.instances.put(instance, methods);
+        });
     }
 
     @SuppressWarnings("unused")
-    public void unsubscribe(Object... instance) {
-        this.instances.removeAll(Arrays.asList(instance));
+    public void unsubscribe(Object... instances) {
+        Arrays.stream(instances).forEach(this.instances::remove);
     }
 
     public <T extends JationEvent<T>> void publish(@NonNull JationEvent<T> event, Object... additional) {
@@ -108,11 +93,6 @@ public class JationObserver {
     private void invoke(Method method, Object instance, Object[] parameters) {
         method.setAccessible(true);
         method.invoke(instance, parameters);
-    }
-
-    @SneakyThrows
-    private Object createInstance(Class<?> clazz) {
-        return clazz.newInstance();
     }
 
     @SuppressWarnings("unused")
@@ -160,7 +140,7 @@ public class JationObserver {
     }
 
     private Set<Method> getMethods(@NonNull Class<?> event) {
-        return this.methods.stream().filter(method -> Arrays.stream(method.getParameters())
+        return this.instances.values().stream().flatMap(List::stream).filter(method -> Arrays.stream(method.getParameters())
                 .anyMatch(parameter -> parameter.getType().equals(event)))
                 .collect(Collectors.toSet());
     }
@@ -179,6 +159,7 @@ public class JationObserver {
     }
 
     public Optional<Object> getInstance(Class<?> clazz) {
-        return this.instances.stream().filter(clazz::isInstance).findFirst();
+        return this.instances.keySet().stream().filter(instance -> instance.getClass().equals(clazz))
+                .findAny();
     }
 }
