@@ -32,20 +32,16 @@
 
 ## 📚 Introduction
 
-jation is a java reflection based event manager which uses the build in java reflection api to automatically invoke methods with parameters and eases the work of a developer by reducing the amount of possible mistakes or missing method invokations.
+jation is a java reflection based event manager which uses the build in java reflection api to automatically invoke methods with parameters and eases the work of a developer by reducing the amount of possible mistakes or missing method invocations.
 
-An event manager is a must have in big or event based applications. This project amies to optimize the event manager I previously build and which was used to power my anticheat.
-
-### 🔗 Build Tools
-
-You can use Maven or Gradle to add this dependency to your project. Therefore you have to add use [jitpack](https://jitpack.io/#micartey/jation/master-SNAPSHOT) and apply the changes as documented.
+An event manager is a must-have in big or event based applications. This project aims to optimize the event manager I previously build and which was used to power my anticheat.
 
 ### 🎈 Getting Started
 
 #### Create a new Observer
 
 ```java
-JationObserver observer = new JationObserver();
+JationObserver observer = new JationObserver(); // Alternatively you can pass a custom executor to the constructor
 ```
 
 #### Subscribe classes
