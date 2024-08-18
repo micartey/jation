@@ -20,6 +20,8 @@ import java.util.stream.Stream;
 
 public class JationObserver {
 
+    public static JationObserver DEFAULT_OBSERVER = new JationObserver();
+
     private final Map<Class<? extends JationEvent<?>>, List<Function<List<Object>, Boolean>>> forEach;
     private final Map<Class<? extends JationEvent<?>>, List<Function<JationEvent<?>, Boolean>>> outset;
     private final Map<Class<? extends JationEvent<?>>, List<Function<JationEvent<?>, Boolean>>> closing;
