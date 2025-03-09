@@ -9,8 +9,16 @@ public interface JationEvent<T extends JationEvent<T>> {
         return (T) this;
     }
 
+    default T publish(Object... additional) {
+        return publish(JationObserver.DEFAULT_OBSERVER, additional);
+    }
+
     default T publishAsync(JationObserver observer, Object... additional) {
         observer.publishAsync(this, additional);
         return (T) this;
+    }
+
+    default T publishAsync(Object... additional) {
+        return publishAsync(JationObserver.DEFAULT_OBSERVER, additional);
     }
 }

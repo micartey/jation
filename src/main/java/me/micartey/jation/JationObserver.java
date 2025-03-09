@@ -11,6 +11,7 @@ import me.micartey.jation.interfaces.TriConsumer;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -26,11 +27,11 @@ public class JationObserver {
     private final Map<Class<? extends JationEvent<?>>, List<Function<JationEvent<?>, Boolean>>> outset;
     private final Map<Class<? extends JationEvent<?>>, List<Function<JationEvent<?>, Boolean>>> closing;
 
-    private final ExecutorService executorService;
+    private final Executor executorService;
 
     private final Map<Object, List<Method>> instances;
 
-    public JationObserver(@NonNull ExecutorService executorService) {
+    public JationObserver(@NonNull Executor executorService) {
         this.executorService = executorService;
 
         this.instances = new HashMap<>();
@@ -76,7 +77,7 @@ public class JationObserver {
                 };
 
                 if (method.isAnnotationPresent(Async.class)) {
-                    CompletableFuture.runAsync(task);
+                    this.executorService.execute(task);
                     return;
                 }
 
@@ -88,7 +89,9 @@ public class JationObserver {
     }
 
     public <T extends JationEvent<T>> void publishAsync(@NonNull JationEvent<T> event, Object... additional) {
-        CompletableFuture.runAsync(() -> publish(event, Arrays.stream(additional).toArray()), this.executorService);
+        this.executorService.execute(() -> {
+            publish(event, Arrays.stream(additional).toArray());
+        });
     }
 
     @SneakyThrows
