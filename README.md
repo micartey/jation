@@ -21,15 +21,16 @@ Furthermore, this event system also provides you with the possibility to execute
 
 ### 🎈 Getting Started
 
-> https://artifacts.micartey.dev/#/public
+Use the following maven repository server in order to add jation as a dependency.
+The following syntax is for gradle, but it works for maven as well.
 
 ```groovy
 maven {
     url "https://artifacts.micartey.dev/public"
 }
-```
 
-```groovy
+// ...
+
 implementation "me.micartey:jation:2.0.0"
 ```
 
@@ -72,10 +73,8 @@ In case your method uses them and there is a possibility, that the parameter is 
 
 #### Consumer Pattern
 
-Reflection is slow. Some say it is more than 100% slower than normal method invocations.
-This is the result of the runtime being unable to perform any optimizations.
-
-> This will be fixed in later versions by utilizing ASM to generate invocation code at runtime to allow the JVM to optimize the calls
+Reflection is slow. Some benchmarks indicate it is more than twice as slow as normal method invocations.
+This is likely the result of the runtime being unable to perform any optimizations.
 
 Therefore, it is recommended to use the consumer pattern for performance critical projects.
 
