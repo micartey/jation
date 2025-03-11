@@ -134,12 +134,12 @@ observer.addAdapter(
 
 For distributed events, you need to add the `Distribution` annotation.
 You can choose between `AT_LEAST_ONCE` or `EXACTLY_ONCE`.
-The difference between these garantees is the amount of machines/instances that possibly receive the events.
+The difference between these guarantees is the amount of machines/instances that possibly receive the events.
 However, an event won't be received twice per JVM instance.
 
 ```java
 @AllArgsConstructor
-@Distribution(Distribution.Garantee.AT_LEAST_ONCE)
+@Distribution(Distribution.Guarantee.AT_LEAST_ONCE)
 public class TestEvent implements JationEvent<TestEvent>, Serializable {
     
     public String someData;

@@ -13,7 +13,6 @@ import me.micartey.jation.utilities.Base64;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
@@ -50,7 +49,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
         if (!event.getClass().isAnnotationPresent(Distribution.class))
             return;
 
-        Distribution.Garantee garantee = event.getClass().getAnnotation(Distribution.class).value();
+        Distribution.Guarantee garantee = event.getClass().getAnnotation(Distribution.class).value();
 
         int id = nextId();
         String serializedPacket = SERIALIZER.serialize(

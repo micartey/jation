@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Distribution {
 
-    Garantee value();
+    Guarantee value();
 
-    enum Garantee {
+    enum Guarantee {
         EXACTLY_ONCE,
         AT_LEAST_ONCE,
     }
