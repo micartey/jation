@@ -21,6 +21,18 @@ Furthermore, this event system also provides you with the possibility to execute
 
 ### 🎈 Getting Started
 
+> https://artifacts.micartey.dev/#/public
+
+```groovy
+maven {
+    url "https://artifacts.micartey.dev/public"
+}
+```
+
+```groovy
+implementation "me.micartey:jation:2.0.0"
+```
+
 #### Create a new Observer
 
 > This step is **optional**.

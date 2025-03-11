@@ -32,7 +32,7 @@ publishing {
     repositories {
         maven {
             name = "micarteyArtifacts"
-            url = "https://artifacts2.micartey.dev/public"
+            url = "https://artifacts.micartey.dev/public"
             credentials {
                 username = System.getenv("USERNAME")
                 password = System.getenv("TOKEN")
