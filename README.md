@@ -126,9 +126,9 @@ It also supports additional arguments.
 For the feature to be enabled, you need to add a network adapter.
 
 ```java
-JationObserver.DEFAULT_OBSERVER.addAdapter(
+observer.addAdapter(
         new UdpNetworkAdapter(LISTEN_PORT, TARGET_PORT) // ports can also be the same
-                .useLoopbackInterface() // Only for local development
+                .useLoopbackInterface()                 // Only for local development
 );
 ```
 
