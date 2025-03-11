@@ -7,12 +7,11 @@ import me.micartey.jation.annotations.Null;
 import me.micartey.jation.annotations.Observe;
 import me.micartey.jation.interfaces.JationEvent;
 import me.micartey.jation.interfaces.TriConsumer;
+import me.micartey.jation.adapter.network.NetworkAdapter;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -21,7 +20,7 @@ import java.util.stream.Stream;
 
 public class JationObserver {
 
-    public static JationObserver DEFAULT_OBSERVER = new JationObserver();
+    public static final JationObserver DEFAULT_OBSERVER = new JationObserver();
 
     private final Map<Class<? extends JationEvent<?>>, List<Function<List<Object>, Boolean>>> forEach;
     private final Map<Class<? extends JationEvent<?>>, List<Function<JationEvent<?>, Boolean>>> outset;
@@ -30,11 +29,13 @@ public class JationObserver {
     private final Executor executorService;
 
     private final Map<Object, List<Method>> instances;
+    private final List<NetworkAdapter> adapters;
 
     public JationObserver(@NonNull Executor executorService) {
         this.executorService = executorService;
 
         this.instances = new HashMap<>();
+        this.adapters = new ArrayList<>();
 
         this.outset = new WeakHashMap<>();
         this.forEach = new WeakHashMap<>();
@@ -43,6 +44,11 @@ public class JationObserver {
 
     public JationObserver() {
         this(Executors.newCachedThreadPool());
+    }
+
+    public void addAdapter(NetworkAdapter adapter) {
+        this.adapters.add(adapter);
+        adapter.listen();
     }
 
     @SuppressWarnings("unused")
@@ -86,6 +92,8 @@ public class JationObserver {
         });
 
         getFunctions(event.getClass(), this.closing).forEach(function -> function.apply(event));
+
+        this.adapters.forEach(adapter -> adapter.publish(event, additional));
     }
 
     public <T extends JationEvent<T>> void publishAsync(@NonNull JationEvent<T> event, Object... additional) {
