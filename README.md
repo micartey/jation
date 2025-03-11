@@ -1,16 +1,12 @@
 # jation
 
 <div align="center">
-  <img
-    src="https://img.shields.io/badge/JDK%20Version-Java%2023-%23EF4041?style=for-the-badge"
-    height="30"
-  />
-  <a href="https://jitpack.io/#micartey/jation/master-SNAPSHOT">
-    <img
-      src="https://img.shields.io/badge/jitpack-master-%2321f21?style=for-the-badge"
-      height="30"
-    />
-  </a>
+    <img src="https://img.shields.io/badge/Written_In-Java%2021-fd5c63?style=for-the-badge&logo=openjdk" alt="Java" />
+    <img src="https://img.shields.io/badge/Build%20Tool-Gradle-50C878?style=for-the-badge&logo=gradle" alt="Gradle" />
+
+<a href="https://github.com/micartey/jation/actions/workflows/gradle.yml">
+    <img src="https://img.shields.io/badge/Published-Packages-89CFF0?style=for-the-badge&logo=artifacthub" alt="Artifact" />
+</a>
 </div>
 
 <br>
@@ -25,8 +21,7 @@
 ## 📚 Introduction
 
 jation is a java reflection based event manager which uses the build in java reflection api to automatically invoke methods with parameters and eases the work of a developer by reducing the amount of possible mistakes or missing method invocations.
-
-An event manager is a must-have in big or event based applications. This project aims to optimize the event manager I previously build and which was used to power my anticheat.
+Furthermore, this event system also provides you with the possibility to execute events on different JVMs in the same network.
 
 ### 🎈 Getting Started
 
