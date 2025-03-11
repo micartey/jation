@@ -1,7 +1,9 @@
 # Folders
 .idea/
 .target/
+.gradle/
 target/
+build/
 
 # Compiled class file
 *.class
