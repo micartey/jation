@@ -40,6 +40,10 @@ An event manager is a must-have in big or event based applications. This project
 
 #### Create a new Observer
 
+> This step is **optional**.
+> 
+> You can also use the static `DEFAULT_OBSERVER`
+
 ```java
 JationObserver observer = new JationObserver(); // Alternatively you can pass a custom executor to the constructor
 ```
@@ -110,4 +114,36 @@ new TestEvent().publish(observer, "additional information", 5);
 
 // Publish the event to all subscribed classes asynchronously
 new TestEvent().publishAsync(observer);
+```
+
+#### Distributed Events
+
+> [!NOTE]  
+> Both events and additional data that might be shared with that event, needs to implement the Java Serializable interface
+
+Events can be distributed and executed on another JVM.
+It also supports additional arguments.
+For the feature to be enabled, you need to add a network adapter.
+
+```java
+JationObserver.DEFAULT_OBSERVER.addAdapter(
+        new UdpNetworkAdapter(Integer.parseInt(args[0]), Integer.parseInt(args[1]))
+                .useLoopbackInterface() // Only for local development
+);
+```
+
+For distributed events, you need to add the `Distribution` interface.
+You can choose between `AT_LEAST_ONCE` or `EXACTLY_ONCE`.
+
+The difference between these garantees is the amount of machines/instances that possibly receive the events.
+However, an event won't be received twice per JVM instance.
+
+```java
+@AllArgsConstructor
+@Distribution(Distribution.Garantee.AT_LEAST_ONCE)
+public class TestEvent implements JationEvent<TestEvent>, Serializable {
+    
+    public String someData;
+    
+}
 ```

@@ -7,13 +7,11 @@ import me.micartey.jation.annotations.Null;
 import me.micartey.jation.annotations.Observe;
 import me.micartey.jation.interfaces.JationEvent;
 import me.micartey.jation.interfaces.TriConsumer;
-import me.micartey.jation.network.NetworkAdapter;
+import me.micartey.jation.adapter.network.NetworkAdapter;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;

@@ -1,4 +1,4 @@
-package me.micartey.jation.network.serializer;
+package me.micartey.jation.adapter.network.serializer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -46,6 +46,10 @@ public class Serializer {
         for (Field field : new CopyOnWriteArrayList<>(fields)) {
             String value = field.getAnnotation(Serialize.class).value();
             String content = pairs.get(value);
+
+            if (content == null)
+                continue;
+
             field.set(instance, this.convert(field.getType(), content));
             fields.remove(field);
         }
@@ -63,7 +67,7 @@ public class Serializer {
             } catch(Exception ignored) { }
         }
 
-        return null;
+        throw new RuntimeException("Could not find matching class to deserialize the object");
     }
 
     private Set<Field> getFields(Class<?> clazz) {

@@ -1,4 +1,4 @@
-package me.micartey.jation.network;
+package me.micartey.jation.adapter.network;
 
 import me.micartey.jation.interfaces.JationEvent;
 

@@ -1,9 +1,9 @@
-package me.micartey.jation.network.packets;
+package me.micartey.jation.adapter.network.packets;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import me.micartey.jation.network.serializer.Serialize;
+import me.micartey.jation.adapter.network.serializer.Serialize;
 
 @Data
 @NoArgsConstructor

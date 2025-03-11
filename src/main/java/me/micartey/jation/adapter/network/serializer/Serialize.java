@@ -1,4 +1,4 @@
-package me.micartey.jation.network.serializer;
+package me.micartey.jation.adapter.network.serializer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
