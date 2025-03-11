@@ -1,21 +1,13 @@
 # jation
 
 <div align="center">
-  <a href="https://www.oracle.com/java/">
-    <img
-      src="https://img.shields.io/badge/Written%20in-java-%23EF4041?style=for-the-badge"
-      height="30"
-    />
-  </a>
+  <img
+    src="https://img.shields.io/badge/JDK%20Version-Java%2023-%23EF4041?style=for-the-badge"
+    height="30"
+  />
   <a href="https://jitpack.io/#micartey/jation/master-SNAPSHOT">
     <img
       src="https://img.shields.io/badge/jitpack-master-%2321f21?style=for-the-badge"
-      height="30"
-    />
-  </a>
-  <a href="https://micartey.github.io/jation/docs" target="_blank">
-    <img
-      src="https://img.shields.io/badge/javadoc-reference-5272B4.svg?style=for-the-badge"
       height="30"
     />
   </a>
