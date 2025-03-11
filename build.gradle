@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
 repositories {
@@ -21,8 +22,26 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_23
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/micartey/jation")
+            credentials {
+                username = "micartey"
+                password = System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
