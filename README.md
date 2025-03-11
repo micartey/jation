@@ -3,10 +3,6 @@
 <div align="center">
     <img src="https://img.shields.io/badge/Written_In-Java%2021-fd5c63?style=for-the-badge&logo=openjdk" alt="Java" />
     <img src="https://img.shields.io/badge/Build%20Tool-Gradle-50C878?style=for-the-badge&logo=gradle" alt="Gradle" />
-
-<a href="https://github.com/micartey/jation/actions/workflows/gradle.yml">
-    <img src="https://img.shields.io/badge/Published-Packages-89CFF0?style=for-the-badge&logo=artifacthub" alt="Artifact" />
-</a>
 </div>
 
 <br>

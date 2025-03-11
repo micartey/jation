@@ -30,5 +30,6 @@ jobs:
       - name: Publish Artifacts
         if: github.event_name == 'push'
         env:
+          USERNAME: ${{ secrets.USERNAME }}
           TOKEN: ${{ secrets.TOKEN }}
         run: ./gradlew publish

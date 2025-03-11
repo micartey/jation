@@ -31,16 +31,17 @@ tasks.withType(JavaCompile).configureEach {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/micartey/jation")
+            name = "micarteyArtifacts"
+            url = "https://artifacts2.micartey.dev/public"
             credentials {
-                username = "micartey"
+                username = System.getenv("USERNAME")
                 password = System.getenv("TOKEN")
             }
         }
     }
+
     publications {
-        gpr(MavenPublication) {
+        maven(MavenPublication) {
             from(components.java)
         }
     }
