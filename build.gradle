@@ -1,6 +1,5 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
+    id 'java'
 }
 
 repositories {
@@ -23,3 +22,7 @@ dependencies {
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_23
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
