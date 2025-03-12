@@ -40,6 +40,10 @@ public class UdpNetworkAdapter implements NetworkAdapter {
 
     @Override
     public void publish(JationEvent<?> event, Object... additional) {
+        /*
+         * Recursion anchor to prevent an infinite loop.
+         * Once this adapter will publish an event, it will add its instance and will therefore be present in the obejct array
+         */
         if (Arrays.stream(additional).filter(Objects::nonNull).anyMatch(object -> object instanceof NetworkAdapter))
             return;
 
@@ -107,9 +111,6 @@ public class UdpNetworkAdapter implements NetworkAdapter {
         }
     }
 
-    /**
-     * Listen to incomming socket data in a virtual thread
-     */
     public void listen() {
         Runnable task = () -> {
             byte[] buffer = new byte[BUFFER_SIZE];
@@ -177,26 +178,26 @@ public class UdpNetworkAdapter implements NetworkAdapter {
     }
 
     @SneakyThrows
-    public void send(String message, InetAddress address, int port) {
+    private void send(String message, InetAddress address, int port) {
         byte[] replyBuffer = message.getBytes(StandardCharsets.UTF_8);
         DatagramPacket packet = new DatagramPacket(replyBuffer, replyBuffer.length, address, port);
         this.datagramSocket.send(packet);
     }
 
     @SneakyThrows
-    public void broadcast(String message, int port) {
+    private void broadcast(String message, int port) {
+        if (this.interfaceAddress == null)
+            throw new RuntimeException("Interface must be set, use broadcast or loopback interface");
+
         byte[] buffer = message.getBytes(StandardCharsets.UTF_8);
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, this.getBraodcastInterface(), port);
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, this.interfaceAddress, port);
         this.datagramSocket.send(packet);
     }
 
-    private InetAddress getBraodcastInterface() throws SocketException {
-        if (this.interfaceAddress != null)
-            return this.interfaceAddress;
-
+    @SneakyThrows
+    private UdpNetworkAdapter useBraodcastInterface() {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        label:
-        while(interfaces.hasMoreElements()) {
+        label: while(interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
 
             if (networkInterface.isLoopback() || !networkInterface.isUp()) {
@@ -215,25 +216,19 @@ public class UdpNetworkAdapter implements NetworkAdapter {
             }
         }
 
-        return this.getBraodcastInterface();
+        return this;
     }
 
     @SneakyThrows
     public UdpNetworkAdapter useLoopbackInterface() {
-        if (this.interfaceAddress != null)
-            throw new RuntimeException("Interface already set. Loopback interface must be set on creation!");
-
-        // Iterate over all network interfaces
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
 
-            // Check if the interface is a loopback and is up
             if (!networkInterface.isLoopback() || !networkInterface.isUp()) {
                 continue;
             }
 
-            // Retrieve addresses associated with this loopback interface
             Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress addr = addresses.nextElement();
@@ -247,5 +242,4 @@ public class UdpNetworkAdapter implements NetworkAdapter {
         this.interfaceAddress = InetAddress.getLoopbackAddress();
         return this;
     }
-
 }
