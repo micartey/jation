@@ -31,7 +31,7 @@ maven {
 
 // ...
 
-implementation "me.micartey:jation:2.0.0"
+implementation "me.micartey:jation:2.1.0"
 ```
 
 #### Create a new Observer
