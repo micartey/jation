@@ -38,6 +38,10 @@ public class UdpNetworkAdapter implements NetworkAdapter {
         this.targetPort = targetPort;
     }
 
+    public UdpNetworkAdapter(int port) {
+        this(port, port);
+    }
+
     @Override
     public void publish(JationEvent<?> event, Object... additional) {
         /*
@@ -87,8 +91,8 @@ public class UdpNetworkAdapter implements NetworkAdapter {
                             broadcast(serializedPacket, this.targetPort);
                             Thread.sleep(2000);
                         }
-                    } catch(InterruptedException e) {
-                        // TODO: Trigger JationEvent if this fails
+                    } catch(InterruptedException ex) {
+                        throw new RuntimeException(ex);
                     }
                 });
             }
@@ -103,8 +107,8 @@ public class UdpNetworkAdapter implements NetworkAdapter {
                             broadcast(ackPacket, this.targetPort);
                             Thread.sleep(2000);
                         }
-                    } catch(InterruptedException e) {
-                        // TODO: Trigger JationEvent if this fails
+                    } catch(InterruptedException ex) {
+                        throw new RuntimeException(ex);
                     }
                 });
             }
