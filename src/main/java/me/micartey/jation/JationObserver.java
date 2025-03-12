@@ -43,7 +43,7 @@ public class JationObserver {
     }
 
     public JationObserver() {
-        this(Executors.newCachedThreadPool());
+        this(Executors.newVirtualThreadPerTaskExecutor());
     }
 
     public void addAdapter(NetworkAdapter adapter) {

@@ -16,8 +16,8 @@
 
 ## 📚 Introduction
 
-jation is a java reflection based event manager which uses the build in java reflection api to automatically invoke methods with parameters and eases the work of a developer by reducing the amount of possible mistakes or missing method invocations.
-Furthermore, this event system also provides you with the possibility to execute events on different JVMs in the same network.
+jation is a java event system which uses the build in java reflection api to automatically invoke methods with parameters.
+The most interesting feature however, is the addition of network adapters which provide the possibility to distribute events between JVMs and machines.
 
 ### 🎈 Getting Started
 
@@ -58,7 +58,7 @@ observer.subscribe(
 #### Reflection pattern
 
 To *observe* methods you need to annotate them with `@Observe`. <br>
-The `@Async` annotation is optional and can invoke the method in the [ForkJoinPool](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html#commonPool--) asynchronously.
+The `@Async` annotation is optional and can invoke the method in their own virtual threads.
 
 ```java
 @Async
@@ -122,7 +122,7 @@ For the feature to be enabled, you need to add a network adapter.
 ```java
 observer.addAdapter(
         new UdpNetworkAdapter(LISTEN_PORT, TARGET_PORT) // ports can also be the same
-                .useLoopbackInterface()                 // Only for local development
+                .useLoopbackInterface()                 // Or useBroadcastInterface()
 );
 ```
 
