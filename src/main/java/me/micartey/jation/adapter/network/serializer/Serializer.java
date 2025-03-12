@@ -2,6 +2,7 @@ package me.micartey.jation.adapter.network.serializer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import me.micartey.jation.utilities.Base64;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class Serializer {
 
-    private final String seperator;
+    private static final String SEPERATOR = ".";
 
     @SneakyThrows
     public String serialize(Object instance, Class<?> clazz) {
@@ -20,14 +21,15 @@ public class Serializer {
 
         StringBuilder output = new StringBuilder();
 
-        for (Field field : fields) {
-            output.append(field.getAnnotation(Serialize.class).value())
-                    .append(":")
-                    .append(field.get(instance))
-                    .append(this.seperator);
+        for(Field field : fields) {
+            Base64.toBase64(
+                    field.getAnnotation(Serialize.class).value() + ":" + field.get(instance)
+            ).ifPresent(output::append);
+
+            output.append(SEPERATOR);
         }
 
-        return output.toString();
+        return output.substring(0, output.length() - SEPERATOR.length()); // Remove last seperator
     }
 
     @SneakyThrows
@@ -36,14 +38,14 @@ public class Serializer {
 
         Map<String, String> pairs = new HashMap<>();
 
-        Arrays.stream(representation.split(this.seperator)).parallel().forEach(pair -> {
+        Arrays.stream(representation.split("\\s*[" + SEPERATOR + "]\\s*")).parallel().map(it -> (String) Base64.fromBase64(it).get()).forEach(pair -> {
             String[] data = pair.split(":");
             pairs.put(data[0], pair.substring(data[0].length() + 1));
         });
 
         T instance = clazz.newInstance();
 
-        for (Field field : new CopyOnWriteArrayList<>(fields)) {
+        for(Field field : new CopyOnWriteArrayList<>(fields)) {
             String value = field.getAnnotation(Serialize.class).value();
             String content = pairs.get(value);
 
@@ -95,7 +97,7 @@ public class Serializer {
             String className = type.equals(long.class) ? "java.lang.Long" : type.equals(int.class) ? "java.lang.Integer" : type.equals(double.class) ? "java.lang.Double" : type.equals(float.class) ? "java.lang.Float" : type.equals(byte.class) ? "java.lang.Byte" : type.equals(boolean.class) ? "java.lang.Boolean" : type.equals(short.class) ? "java.lang.Short" : type.getName();
             Method method = Class.forName(className).getMethod("valueOf", String.class);
             return method.invoke(null, name);
-        } catch (Exception e) {
+        } catch(Exception e) {
             return name;
         }
     }

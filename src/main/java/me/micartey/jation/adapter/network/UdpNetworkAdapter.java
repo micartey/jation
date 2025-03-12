@@ -22,7 +22,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
 
     private static final ExecutorService RETRY_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
-    private static final Serializer SERIALIZER = new Serializer("汉语");
+    private static final Serializer SERIALIZER = new Serializer();
     private static final int BUFFER_SIZE = 4096;
 
     private final Map<Integer, Function<DatagramPacket>> tasks = new HashMap<>();
