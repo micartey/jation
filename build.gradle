@@ -10,9 +10,9 @@ repositories {
     }
 }
 
-group = 'me.micartey'
-version = '2.2.0'
-description = 'jation'
+group = "me.micartey"
+version = "2.2.0"
+description = "jation"
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.36'
