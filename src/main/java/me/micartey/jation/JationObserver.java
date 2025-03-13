@@ -48,7 +48,9 @@ public class JationObserver {
 
     public void addAdapter(NetworkAdapter adapter) {
         this.adapters.add(adapter);
-        adapter.listen();
+
+        Thread.ofVirtual()
+                .start(adapter::listen);
     }
 
     @SuppressWarnings("unused")
