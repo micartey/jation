@@ -27,9 +27,9 @@ public class UdpNetworkAdapter implements NetworkAdapter {
 
     private final Map<Integer, Function<DatagramPacket>> tasks = new HashMap<>();
 
+    private final List<InetAddress> interfaceAddress = new ArrayList<>();
     private final AtomicInteger transactionCounter = new AtomicInteger();
     private final DatagramSocket datagramSocket;
-    private InetAddress interfaceAddress;
     private final int targetPort;
 
     @SneakyThrows
@@ -77,7 +77,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
 //            objects[objects.length - 1] = this;
 //            JationObserver.DEFAULT_OBSERVER.publish(event2, objects);
 
-        switch (garantee) {
+        switch(garantee) {
             case EXACTLY_ONCE -> {
                 tasks.put(id, packet -> send(ackPacket, packet.getAddress(), packet.getPort()));
 
@@ -87,7 +87,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
                  */
                 RETRY_EXECUTOR.submit(() -> {
                     try {
-                        while (tasks.containsKey(id)) {
+                        while(tasks.containsKey(id)) {
                             broadcast(serializedPacket, this.targetPort);
                             Thread.sleep(2000);
                         }
@@ -98,11 +98,12 @@ public class UdpNetworkAdapter implements NetworkAdapter {
             }
 
             case AT_LEAST_ONCE -> {
-                tasks.put(id, packet -> { }); // Simple placeholder
+                tasks.put(id, packet -> {
+                }); // Simple placeholder
 
                 RETRY_EXECUTOR.submit(() -> {
                     try {
-                        while (tasks.containsKey(id)) {
+                        while(tasks.containsKey(id)) {
                             broadcast(serializedPacket, this.targetPort);
                             broadcast(ackPacket, this.targetPort);
                             Thread.sleep(2000);
@@ -115,59 +116,49 @@ public class UdpNetworkAdapter implements NetworkAdapter {
         }
     }
 
+    @SneakyThrows
     public void listen() {
-        Runnable task = () -> {
-            byte[] buffer = new byte[BUFFER_SIZE];
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        byte[] buffer = new byte[BUFFER_SIZE];
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
-            while(true) {
-                try {
-                    this.datagramSocket.receive(packet); // Blocked Waiting for broadcast message
-                    String message = new String(packet.getData(), 0, packet.getLength());
+        while(true) {
+            this.datagramSocket.receive(packet); // Blocked Waiting for broadcast message
+            String message = new String(packet.getData(), 0, packet.getLength());
 
-                    Object parsedPacket = SERIALIZER.deserialize(message, PacketInvokeMethod.class, PacketAcknowledge.class);
+            Object parsedPacket = SERIALIZER.deserialize(message, PacketInvokeMethod.class, PacketAcknowledge.class);
 
-                    /*
-                     * Whenever the server receives an acknowledgment, it will execute some task
-                     */
-                    if (parsedPacket instanceof PacketAcknowledge ack) {
-                        tasks.getOrDefault(ack.getAckId(), (datagramPacket) -> { }).apply(packet);
-                        tasks.remove(ack.getAckId());
-                    }
-
-                    /*
-                     * When invoke method packet is received, send an ack and wait for a confirmation
-                     */
-                    if (parsedPacket instanceof PacketInvokeMethod invoke) {
-                        int ackId = invoke.getAckId();
-
-                        this.tasks.put(ackId, (datagramPacket) -> {
-                            System.out.println("task");
-
-                            JationEvent<?> event = (JationEvent<?>) Base64.fromBase64(invoke.getEventData()).get();
-                            Object[] objects = (Object[]) Base64.fromBase64(invoke.getAdditionalObjects()).get();
-
-                            // Add adapter instance as last argument
-                            objects = Arrays.copyOf(objects, objects.length + 1);
-                            objects[objects.length - 1] = this;
-
-                            JationObserver.DEFAULT_OBSERVER.publish(event, objects);
-                        });
-
-                        this.send(
-                                SERIALIZER.serialize(new PacketAcknowledge(ackId), PacketAcknowledge.class),
-                                packet.getAddress(),
-                                packet.getPort()
-                        );
-                    }
-
-                } catch(Exception exception) {
-                    exception.printStackTrace();
-                }
+            /*
+             * Whenever the server receives an acknowledgment, it will execute some task
+             */
+            if (parsedPacket instanceof PacketAcknowledge ack) {
+                tasks.getOrDefault(ack.getAckId(), (datagramPacket) -> { }).apply(packet);
+                tasks.remove(ack.getAckId());
             }
-        };
 
-        Thread.ofVirtual().start(task);
+            /*
+             * When invoke method packet is received, send an ack and wait for a confirmation
+             */
+            if (parsedPacket instanceof PacketInvokeMethod invoke) {
+                int ackId = invoke.getAckId();
+
+                this.tasks.put(ackId, (datagramPacket) -> {
+                    JationEvent<?> event = (JationEvent<?>) Base64.fromBase64(invoke.getEventData()).get();
+                    Object[] objects = (Object[]) Base64.fromBase64(invoke.getAdditionalObjects()).get();
+
+                    // Add adapter instance as last argument
+                    objects = Arrays.copyOf(objects, objects.length + 1);
+                    objects[objects.length - 1] = this;
+
+                    JationObserver.DEFAULT_OBSERVER.publish(event, objects);
+                });
+
+                this.send(
+                        SERIALIZER.serialize(new PacketAcknowledge(ackId), PacketAcknowledge.class),
+                        packet.getAddress(),
+                        packet.getPort()
+                );
+            }
+        }
     }
 
     private synchronized int nextId() {
@@ -190,18 +181,18 @@ public class UdpNetworkAdapter implements NetworkAdapter {
 
     @SneakyThrows
     private void broadcast(String message, int port) {
-        if (this.interfaceAddress == null)
-            throw new RuntimeException("Interface must be set, use broadcast or loopback interface");
-
-        byte[] buffer = message.getBytes(StandardCharsets.UTF_8);
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, this.interfaceAddress, port);
-        this.datagramSocket.send(packet);
+        for(InetAddress address : this.interfaceAddress) {
+            byte[] buffer = message.getBytes(StandardCharsets.UTF_8);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, port);
+            this.datagramSocket.send(packet);
+        }
     }
 
     @SneakyThrows
-    private UdpNetworkAdapter useBraodcastInterface() {
+    public UdpNetworkAdapter useBraodcastInterface() {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        label: while(interfaces.hasMoreElements()) {
+        label:
+        while(interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
 
             if (networkInterface.isLoopback() || !networkInterface.isUp()) {
@@ -215,7 +206,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
                 if (broadcast == null)
                     continue;
 
-                this.interfaceAddress = broadcast;
+                this.interfaceAddress.add(broadcast);
                 break label;
             }
         }
@@ -226,7 +217,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
     @SneakyThrows
     public UdpNetworkAdapter useLoopbackInterface() {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements()) {
+        while(interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
 
             if (!networkInterface.isLoopback() || !networkInterface.isUp()) {
@@ -234,16 +225,30 @@ public class UdpNetworkAdapter implements NetworkAdapter {
             }
 
             Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                InetAddress addr = addresses.nextElement();
-                if (addr != null) {
-                    this.interfaceAddress = addr;
-                    return this;
-                }
+            while(addresses.hasMoreElements()) {
+                InetAddress loopback = addresses.nextElement();
+
+                if (loopback == null)
+                    continue;
+
+                this.interfaceAddress.add(loopback);
+                return this;
             }
         }
 
-        this.interfaceAddress = InetAddress.getLoopbackAddress();
+        this.interfaceAddress.add(InetAddress.getLoopbackAddress());
+        return this;
+    }
+
+    /**
+     * Add specific interface if {@link UdpNetworkAdapter#useBraodcastInterface()} and {@link UdpNetworkAdapter#useLoopbackInterface()}
+     * are not sufficient
+     *
+     * @param address InetAddress, if applicable a broadcast address
+     * @return current instance to allow chained calles
+     */
+    public UdpNetworkAdapter addInterface(InetAddress address) {
+        this.interfaceAddress.add(address);
         return this;
     }
 }
