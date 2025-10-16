@@ -2,6 +2,7 @@ package me.micartey.jation;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import me.micartey.jation.adapter.network.UdpNetworkAdapter;
 import me.micartey.jation.annotations.Async;
 import me.micartey.jation.annotations.Null;
 import me.micartey.jation.annotations.Observe;
@@ -48,6 +49,7 @@ public class JationObserver {
 
     public void addAdapter(NetworkAdapter adapter) {
         this.adapters.add(adapter);
+        adapter.setObserver(this);
 
         Thread.ofVirtual()
                 .start(adapter::listen);

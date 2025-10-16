@@ -1,5 +1,6 @@
 package me.micartey.jation.adapter.network;
 
+import lombok.Setter;
 import lombok.SneakyThrows;
 import me.micartey.jation.JationObserver;
 import me.micartey.jation.annotations.Distribution;
@@ -23,19 +24,21 @@ public class UdpNetworkAdapter implements NetworkAdapter {
     private static final ExecutorService RETRY_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
     private static final Serializer SERIALIZER = new Serializer();
-    private static final int BUFFER_SIZE = 4096;
+    private static final int SOCKET_BUFFER_SIZE = 4096;
 
     private final Map<Integer, Function<DatagramPacket>> tasks = new HashMap<>();
 
     private final List<InetAddress> interfaceAddress = new ArrayList<>();
     private final AtomicInteger transactionCounter = new AtomicInteger();
     private final DatagramSocket datagramSocket;
-    private final int targetPort;
+    private final int[] targetPorts;
+
+    @Setter private JationObserver observer = JationObserver.DEFAULT_OBSERVER;
 
     @SneakyThrows
-    public UdpNetworkAdapter(int port, int targetPort) {
+    public UdpNetworkAdapter(int port, int... targetPorts) {
         this.datagramSocket = new DatagramSocket(port);
-        this.targetPort = targetPort;
+        this.targetPorts = targetPorts;
     }
 
     public UdpNetworkAdapter(int port) {
@@ -88,7 +91,9 @@ public class UdpNetworkAdapter implements NetworkAdapter {
                 RETRY_EXECUTOR.submit(() -> {
                     try {
                         while(tasks.containsKey(id)) {
-                            broadcast(serializedPacket, this.targetPort);
+                            for(int port : this.targetPorts) {
+                                send(serializedPacket, port);
+                            }
                             Thread.sleep(2000);
                         }
                     } catch(InterruptedException ex) {
@@ -104,8 +109,10 @@ public class UdpNetworkAdapter implements NetworkAdapter {
                 RETRY_EXECUTOR.submit(() -> {
                     try {
                         while(tasks.containsKey(id)) {
-                            broadcast(serializedPacket, this.targetPort);
-                            broadcast(ackPacket, this.targetPort);
+                            for(int port : this.targetPorts) {
+                                send(serializedPacket, port);
+                                send(ackPacket, port);
+                            }
                             Thread.sleep(2000);
                         }
                     } catch(InterruptedException ex) {
@@ -118,7 +125,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
 
     @SneakyThrows
     public void listen() {
-        byte[] buffer = new byte[BUFFER_SIZE];
+        byte[] buffer = new byte[SOCKET_BUFFER_SIZE];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
         while(true) {
@@ -149,7 +156,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
                     objects = Arrays.copyOf(objects, objects.length + 1);
                     objects[objects.length - 1] = this;
 
-                    JationObserver.DEFAULT_OBSERVER.publish(event, objects);
+                    this.observer.publish(event, objects);
                 });
 
                 this.send(
@@ -180,7 +187,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
     }
 
     @SneakyThrows
-    private void broadcast(String message, int port) {
+    private void send(String message, int port) {
         for(InetAddress address : this.interfaceAddress) {
             byte[] buffer = message.getBytes(StandardCharsets.UTF_8);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, port);
