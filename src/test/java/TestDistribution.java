@@ -2,7 +2,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.SneakyThrows;
 import me.micartey.jation.JationObserver;
-import me.micartey.jation.Main;
 import me.micartey.jation.adapter.network.NetworkAdapter;
 import me.micartey.jation.adapter.network.UdpNetworkAdapter;
 import me.micartey.jation.annotations.Distribution;
@@ -48,11 +47,11 @@ public class TestDistribution {
     @SneakyThrows
     public void testDistribution() {
         AtomicBoolean received = new AtomicBoolean(false);
-        TestEvent testEvent = new TestEvent("Test 123");
+        TestEvent2 testEvent = new TestEvent2("Test 123");
 
         observerOne.subscribe(new Object() {
             @Observe
-            public void test(TestEvent testEvent) {
+            public void test(TestEvent2 testEvent) {
                 received.set(true);
             }
         });
@@ -77,7 +76,7 @@ public class TestDistribution {
             }
         });
 
-        observerTwo.subscribe(new Object() {
+        observerThree.subscribe(new Object() {
             @Observe
             public void test(TestEvent testEvent) {
                 received.incrementAndGet();
@@ -88,13 +87,22 @@ public class TestDistribution {
 
         Thread.sleep(2000);
 
-        Assertions.assertEquals(1, received.get()); // TODO: As the adapter is triggered after local consuming we need 3 for testing
+        Assertions.assertEquals(1, received.get());
     }
 
     @Data
     @AllArgsConstructor
     @Distribution(Distribution.Guarantee.EXACTLY_ONCE)
-    public static class TestEvent implements JationEvent<Main.TestEvent>, Serializable {
+    public static class TestEvent implements JationEvent<TestEvent>, Serializable {
+
+        public String data;
+
+    }
+
+    @Data
+    @AllArgsConstructor
+    @Distribution(Distribution.Guarantee.AT_LEAST_ONCE)
+    public static class TestEvent2 implements JationEvent<TestEvent>, Serializable {
 
         public String data;
 
