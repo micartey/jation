@@ -41,6 +41,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
         this.targetPorts = targetPorts;
     }
 
+    @SuppressWarnings("unused")
     public UdpNetworkAdapter(int port) {
         this(port, port);
     }
@@ -72,13 +73,6 @@ public class UdpNetworkAdapter implements NetworkAdapter {
                 new PacketAcknowledge(id),
                 PacketAcknowledge.class
         );
-
-//            PacketInvokeMethod invoke = SERIALIZER.deserialize(serializedPacket, PacketInvokeMethod.class);
-//            JationEvent<?> event2 = (JationEvent<?>) Base64.fromBase64(invoke.getEventData()).get();
-//            Object[] objects = (Object[]) Base64.fromBase64(invoke.getAdditionalObjects()).get();
-//            objects = Arrays.copyOf(objects, objects.length + 1);
-//            objects[objects.length - 1] = this;
-//            JationObserver.DEFAULT_OBSERVER.publish(event2, objects);
 
         switch(garantee) {
             case EXACTLY_ONCE -> {
