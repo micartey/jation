@@ -121,15 +121,16 @@ For the feature to be enabled, you need to add a network adapter.
 
 ```java
 observer.addAdapter(
-        new UdpNetworkAdapter(LISTEN_PORT, TARGET_PORT) // ports can also be the same
-                .useLoopbackInterface()                 // Or useBroadcastInterface()
+        new UdpNetworkAdapter(LISTEN_PORT, TARGET_PORTS) // ports can also be the same
+                .useLoopbackInterface()                 // To send events to the same machine
+                .useBroadcastInterface()                // To send events through the same subnet
 );
 ```
 
 For distributed events, you need to add the `Distribution` annotation.
 You can choose between `AT_LEAST_ONCE` or `EXACTLY_ONCE`.
 The difference between these guarantees is the amount of machines/instances that possibly receive the events.
-However, an event won't be received twice per JVM instance.
+Please check the [Protocol](./PROTOCOL.md) for further details.
 
 ```java
 @AllArgsConstructor
@@ -139,49 +140,4 @@ public class TestEvent implements JationEvent<TestEvent>, Serializable {
     public String someData;
     
 }
-```
-
-#### EXACTLY_ONCE
-
-```mermaid
-sequenceDiagram
-    participant Publisher as Publisher
-    participant Receiver as Receiver
-    participant Observer as JationObserver
-
-    loop every 2 seconds
-        Publisher->>Receiver: Send PacketInvokeMethod (event, id)
-        activate Receiver
-    end
-
-    Receiver->>Receiver: Deserialize PacketInvokeMethod
-    Receiver->>Publisher: Send PacketAcknowledge (ackId)
-    deactivate Receiver
-
-    activate Publisher
-    Note over Receiver: Receiver needs to know that it has been selected
-    Publisher->>Receiver: send PacketAcknowledge (ackId)
-    deactivate Publisher
-    
-    Publisher->>Publisher: Remove from retry tasks
-
-    Receiver->>Observer: publish(event, additional + adapter)
-```
-
-#### AT_LEAST_ONCE
-
-```mermaid
-sequenceDiagram
-    participant Publisher
-    participant Receiver
-
-    loop every 2 seconds
-        Publisher->>Receiver: Send PacketInvokeMethod
-        Publisher->>Receiver: Send PacketAcknowledge (redundant ack)
-    end
-    
-    Note over Receiver: Receiver needs to know that it has been selected
-    Receiver->>Publisher: send PacketAcknowledge (ackId)
-
-    Receiver->>Observer: publish(event, additional + adapter)
 ```
