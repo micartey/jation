@@ -44,8 +44,6 @@ And use specific observers for any sub-queues that your project might need.
 JationObserver observer = new JationObserver(); // Alternatively you can pass a custom executor for async events
 ```
 
-[Distributed events](#distributed-events) publish only to the default observer
-
 ### Subscribe classes
 
 To subscribe classes you need to call the `subscribe` method and pass the object instances to the varargs parameter.
@@ -151,8 +149,10 @@ sequenceDiagram
     participant Receiver as Receiver
     participant Observer as JationObserver
 
-    Publisher->>Receiver: Send PacketInvokeMethod (event, id)
-    activate Receiver
+    loop every 2 seconds
+        Publisher->>Receiver: Send PacketInvokeMethod (event, id)
+        activate Receiver
+    end
 
     Receiver->>Receiver: Deserialize PacketInvokeMethod
     Receiver->>Publisher: Send PacketAcknowledge (ackId)
@@ -178,11 +178,10 @@ sequenceDiagram
     loop every 2 seconds
         Publisher->>Receiver: Send PacketInvokeMethod
         Publisher->>Receiver: Send PacketAcknowledge (redundant ack)
-
-        Note over Receiver: Receiver needs to know that it has been selected
-        Receiver->>Publisher: send PacketAcknowledge (ackId)
-        
     end
+    
+    Note over Receiver: Receiver needs to know that it has been selected
+    Receiver->>Publisher: send PacketAcknowledge (ackId)
 
     Receiver->>Observer: publish(event, additional + adapter)
 ```

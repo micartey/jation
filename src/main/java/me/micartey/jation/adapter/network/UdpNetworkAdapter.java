@@ -3,12 +3,12 @@ package me.micartey.jation.adapter.network;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import me.micartey.jation.JationObserver;
-import me.micartey.jation.annotations.Distribution;
-import me.micartey.jation.interfaces.Function;
-import me.micartey.jation.interfaces.JationEvent;
 import me.micartey.jation.adapter.network.packets.PacketAcknowledge;
 import me.micartey.jation.adapter.network.packets.PacketInvokeMethod;
 import me.micartey.jation.adapter.network.serializer.Serializer;
+import me.micartey.jation.annotations.Distribution;
+import me.micartey.jation.interfaces.Function;
+import me.micartey.jation.interfaces.JationEvent;
 import me.micartey.jation.utilities.Base64;
 
 import java.net.*;
@@ -139,7 +139,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
             /*
              * When invoke method packet is received, send an ack and wait for a confirmation
              */
-            if (parsedPacket instanceof PacketInvokeMethod invoke) {
+            else if (parsedPacket instanceof PacketInvokeMethod invoke) {
                 int ackId = invoke.getAckId();
 
                 this.tasks.put(ackId, (datagramPacket) -> {
