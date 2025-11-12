@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class UdpNetworkAdapter implements NetworkAdapter {
 
-    private static final ExecutorService RETRY_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
+    private static final ExecutorService RETRY_EXECUTOR = Executors.newCachedThreadPool();
 
     private static final Serializer SERIALIZER = new Serializer();
     private static final int SOCKET_BUFFER_SIZE = 4096;
