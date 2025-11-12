@@ -44,15 +44,14 @@ public class JationObserver {
     }
 
     public JationObserver() {
-        this(Executors.newVirtualThreadPerTaskExecutor());
+        this(Executors.newCachedThreadPool());
     }
 
     public void addAdapter(NetworkAdapter adapter) {
         this.adapters.add(adapter);
         adapter.setObserver(this);
 
-        Thread.ofVirtual()
-                .start(adapter::listen);
+        executorService.execute(adapter::listen);
     }
 
     @SuppressWarnings("unused")

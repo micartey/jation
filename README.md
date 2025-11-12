@@ -27,7 +27,7 @@ maven {
 
 // ...
 
-implementation "me.micartey:jation:2.3.0"
+implementation "me.micartey:jation:2.3.1"
 ```
 
 ### Event Observers
@@ -43,8 +43,6 @@ And use specific observers for any sub-queues that your project might need.
 ```java
 JationObserver observer = new JationObserver(); // Alternatively you can pass a custom executor for async events
 ```
-
-[Distributed events](#distributed-events) publish only to the default observer
 
 ### Subscribe classes
 
@@ -123,15 +121,16 @@ For the feature to be enabled, you need to add a network adapter.
 
 ```java
 observer.addAdapter(
-        new UdpNetworkAdapter(LISTEN_PORT, TARGET_PORT) // ports can also be the same
-                .useLoopbackInterface()                 // Or useBroadcastInterface()
+        new UdpNetworkAdapter(LISTEN_PORT, TARGET_PORTS) // ports can also be the same
+                .useLoopbackInterface()                 // To send events to the same machine
+                .useBroadcastInterface()                // To send events through the same subnet
 );
 ```
 
 For distributed events, you need to add the `Distribution` annotation.
 You can choose between `AT_LEAST_ONCE` or `EXACTLY_ONCE`.
 The difference between these guarantees is the amount of machines/instances that possibly receive the events.
-However, an event won't be received twice per JVM instance.
+Please check the [Protocol](./PROTOCOL.md) for further details.
 
 ```java
 @AllArgsConstructor
