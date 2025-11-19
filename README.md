@@ -27,7 +27,7 @@ maven {
 
 // ...
 
-implementation "me.micartey:jation:2.3.1"
+implementation "me.micartey:jation:2.4.0"
 ```
 
 ### Event Observers
