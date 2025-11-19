@@ -13,17 +13,16 @@ import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestBroadcast {
 
     private JationObserver observerOne, observerTwo;
 
     private static final NetworkAdapter adapterOne = new UdpNetworkAdapter(7777, 8888)
-            .useBraodcastInterface();
+            .useBroadcastInterface();
 
     private static final NetworkAdapter adapterTwo = new UdpNetworkAdapter(8888, 7777)
-            .useBraodcastInterface();
+            .useBroadcastInterface();
 
     @BeforeEach
     public void setup() {

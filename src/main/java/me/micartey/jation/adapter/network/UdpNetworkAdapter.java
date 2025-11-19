@@ -190,9 +190,8 @@ public class UdpNetworkAdapter implements NetworkAdapter {
     }
 
     @SneakyThrows
-    public UdpNetworkAdapter useBraodcastInterface() {
+    public UdpNetworkAdapter useBroadcastInterface() {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        label:
         while(interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
 
@@ -207,8 +206,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
                 if (broadcast == null)
                     continue;
 
-                this.interfaceAddress.add(broadcast);
-                break label;
+                this.interfaceAddress.add(broadcast); // Add all broadcast interfaces
             }
         }
 
@@ -242,7 +240,7 @@ public class UdpNetworkAdapter implements NetworkAdapter {
     }
 
     /**
-     * Add specific interface if {@link UdpNetworkAdapter#useBraodcastInterface()} and {@link UdpNetworkAdapter#useLoopbackInterface()}
+     * Add specific interface if {@link UdpNetworkAdapter#useBroadcastInterface()} and {@link UdpNetworkAdapter#useLoopbackInterface()}
      * are not sufficient
      *
      * @param address InetAddress, if applicable a broadcast address

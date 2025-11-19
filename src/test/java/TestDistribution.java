@@ -21,15 +21,15 @@ public class TestDistribution {
 
     private static final NetworkAdapter adapterOne = new UdpNetworkAdapter(4444, 5555, 6666)
             .useLoopbackInterface()
-            .useBraodcastInterface();
+            .useBroadcastInterface();
 
     private static final NetworkAdapter adapterTwo = new UdpNetworkAdapter(5555, 4444, 6666)
             .useLoopbackInterface()
-            .useBraodcastInterface();
+            .useBroadcastInterface();
 
     private static final NetworkAdapter adapterThree = new UdpNetworkAdapter(6666, 4444, 5555)
             .useLoopbackInterface()
-            .useBraodcastInterface();
+            .useBroadcastInterface();
 
     @BeforeEach
     public void setup() {
