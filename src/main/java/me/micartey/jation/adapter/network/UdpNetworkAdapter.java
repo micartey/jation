@@ -65,7 +65,11 @@ public class UdpNetworkAdapter implements NetworkAdapter {
 
         int id = nextId();
         String serializedPacket = SERIALIZER.serialize(
-                new PacketInvokeMethod(id, Base64.toBase64(event).get(), Base64.toBase64(additional).get()),
+                new PacketInvokeMethod(
+                        id,
+                        Base64.toBase64(event).orElseThrow(() -> new RuntimeException("Cannot serialize event to base64")),
+                        Base64.toBase64(additional).orElseThrow(() -> new RuntimeException("Cannot serialize additional"))
+                ),
                 PacketInvokeMethod.class
         );
 
